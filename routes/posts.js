@@ -1,6 +1,9 @@
 var express = require('express')
 var router = express.Router();
 
+var auth = require('../routes/auth')
+var Post = require('../models/Post')
+
 router.route('/')
 
 .post(auth.checkAuthenticated, (req, res) => {

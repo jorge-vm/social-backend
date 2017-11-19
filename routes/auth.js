@@ -1,8 +1,9 @@
-var User = require('./models/User.js')
 var bcrypt = require('bcrypt-nodejs')
 var jwt = require('jwt-simple')
 var express = require('express')
 var router = express.Router()
+
+var User = require('../models/User')
 
 router.post('/register', (req, res) => {
     var userData = req.body

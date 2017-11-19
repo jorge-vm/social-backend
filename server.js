@@ -1,13 +1,12 @@
 var express = require('express')
 var cors = require('cors')
 var mongoose = require('mongoose')
+var bodyParser = require('body-parser')
 var app = express()
 
-var User = require('./models/User.js')
-var Post = require('./models/Post.js')
-var auth = require('./routes/auth.js')
-var posts = require('./routes/posts.js')
-var users = require('./routes/users.js')
+var auth = require('./routes/auth')
+var posts = require('./routes/posts')
+var users = require('./routes/users')
 
 mongoose.Promise = Promise
 
@@ -18,7 +17,7 @@ mongoose.connect('', { useMongoClient: true }, (err) => {
     if (!err)
         console.log('connected to mongo')
 })
-
+ 
 app.use('/auth', auth.router)
 app.use('/posts',posts)
 app.use('/users',users)
