@@ -4,16 +4,21 @@ var mongoose = require('mongoose')
 var bodyParser = require('body-parser')
 var app = express()
 
-var auth = require('./routes/auth')
-var posts = require('./routes/posts')
-var users = require('./routes/users')
+var auth = require('./controllers/auth')
+var posts = require('./controllers/posts')
+var users = require('./controllers/users')
 
 mongoose.Promise = Promise
 
 app.use(cors())
 app.use(bodyParser.json())
 
-mongoose.connect('', { useMongoClient: true }, (err) => {
+var mongoUriString =
+process.env.MLAB_URI ||
+'mongodb://localhost/jvm-social' 
+
+
+mongoose.connect(mongoUriString, { useMongoClient: true }, (err) => {
     if (!err)
         console.log('connected to mongo')
 })
