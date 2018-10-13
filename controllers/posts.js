@@ -1,33 +1,56 @@
-var express = require('express')
+var express = require("express");
 var router = express.Router();
 
-var auth = require('../controllers/auth')
-var Post = require('../models/Post')
+var auth = require("../controllers/auth");
+var Post = require("../models/Post");
+var User = require("../models/User");
 
-router.route('/')
-    .all(auth.checkAuthenticated)
-    
-    .post((req, res) => {
-        let postData = req.body
-        postData.author = req.userId
+router
+  .route("/")
+  .all(auth.checkAuthenticated)
 
-        let post = new Post(postData)
+  .post((req, res) => {
+    let postData = req.body;
+    postData.author = req.userId;
 
-        post.save((err, result) => {
-            if (err) {
-                console.error('saving post error')
-                return res.status(500).send({ message: 'saving post error' })
-            }
-            res.status(200).send({ id: post._id })
-        })
-    })
+    let post = new Post(postData);
 
-router.route('/:id')
+    post.save((err, result) => {
+      if (err) {
+        console.error("saving post error");
+        return res.status(500).send({ message: "saving post error" });
+      }
+      res.status(200).send({ id: post._id });
+    });
+  });
 
-    .get(async (req, res) => {
-        var author = req.params.id
-        var posts = await Post.find({ author })
-        res.send(posts)
-    })
+router
+  .route("/content")
+  .all(auth.checkAuthenticated)
+  .get(async (req, res) => {
+    try {
+      const userId = req.userId;
 
-module.exports = router
+      const user = await User.findById(userId, "-pwd -__v");
+
+      const posts = await Post.find().where({
+        author: { $in: user.following }
+      }).populate('author');
+
+      res.status(200).send(posts);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send({ message: "Couldn't retrieve content" });
+    }
+  });
+
+router
+  .route("/:id")
+
+  .get(async (req, res) => {
+    var author = req.params.id;
+    var posts = await Post.find({ author });
+    res.send(posts);
+  });
+
+module.exports = router;
