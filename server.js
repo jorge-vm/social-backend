@@ -1,12 +1,13 @@
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 const app = express();
+const logger = require('./logger');
 
-const auth = require("./controllers/auth");
-const posts = require("./controllers/posts");
-const users = require("./controllers/users");
+const auth = require('./controllers/auth');
+const posts = require('./controllers/posts');
+const users = require('./controllers/users');
 (async () => {
   try {
     mongoose.Promise = Promise;
@@ -14,20 +15,19 @@ const users = require("./controllers/users");
     app.use(cors());
     app.use(bodyParser.json());
 
-    const mongoUriString =
-      process.env.MLAB_URI || "mongodb://localhost/jvm-social";
+    const mongoUriString = process.env.MLAB_URI || 'mongodb://localhost/jvm-social';
 
     await mongoose.connect(
       mongoUriString,
       { useNewUrlParser: true }
     );
-    console.log("connected to mongo");
+    logger.info('connected to mongo');
 
-    app.use("/auth", auth.router);
-    app.use("/posts", posts);
-    app.use("/users", users);
-    app.use("*", function(req, res) {
-      res.status(404).send({ message: "Not found" });
+    app.use('/auth', auth.router);
+    app.use('/posts', posts);
+    app.use('/users', users);
+    app.use('*', function(req, res) {
+      res.status(404).send({ message: 'Not found' });
     });
 
     app.listen(process.env.PORT || 3000);

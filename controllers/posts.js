@@ -1,12 +1,13 @@
-var express = require("express");
+var express = require('express');
 var router = express.Router();
+const logger = require('../logger');
 
-var auth = require("../controllers/auth");
-var Post = require("../models/Post");
-var User = require("../models/User");
+var auth = require('../controllers/auth');
+var Post = require('../models/Post');
+var User = require('../models/User');
 
 router
-  .route("/")
+  .route('/')
   .all(auth.checkAuthenticated)
 
   .post((req, res) => {
@@ -17,35 +18,37 @@ router
 
     post.save((err, result) => {
       if (err) {
-        console.error("saving post error");
-        return res.status(500).send({ message: "saving post error" });
+        logger.error('saving post error');
+        return res.status(500).send({ message: 'saving post error' });
       }
       res.status(200).send({ id: post._id });
     });
   });
 
 router
-  .route("/content")
+  .route('/content')
   .all(auth.checkAuthenticated)
   .get(async (req, res) => {
     try {
       const userId = req.userId;
 
-      const user = await User.findById(userId, "-pwd -__v");
+      const user = await User.findById(userId, '-pwd -__v');
 
-      const posts = await Post.find().where({
-        author: { $in: user.following }
-      }).populate('author');
+      const posts = await Post.find()
+        .where({
+          author: { $in: user.following }
+        })
+        .populate('author');
 
       res.status(200).send(posts);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       return res.status(500).send({ message: "Couldn't retrieve content" });
     }
   });
 
 router
-  .route("/:id")
+  .route('/:id')
 
   .get(async (req, res) => {
     var author = req.params.id;

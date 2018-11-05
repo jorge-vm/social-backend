@@ -1,5 +1,6 @@
 const express = require('express');
 let router = express.Router();
+const logger = require('../logger');
 
 const auth = require('../controllers/auth');
 const User = require('../models/User');
@@ -12,7 +13,7 @@ router
       const users = await User.find({}, '-pwd -__v');
       res.send(users);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       res.sendStatus(500);
     }
   });
@@ -25,7 +26,7 @@ router
       const user = await User.findById(req.params.id, '-pwd -__v');
       res.send(user);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       res.sendStatus(500);
     }
   });
@@ -46,7 +47,7 @@ router
 
       res.status(200).send({ following: 'success' });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       return res.status(500).send({ message: 'saving followee error' });
     }
   });
